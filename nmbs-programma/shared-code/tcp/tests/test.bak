@@ -1,0 +1,25 @@
+#lang racket
+
+(require "receiver.rkt"
+         "sender.rkt"
+         rackunit/text-ui
+         rackunit
+         mock)
+
+
+
+(define (dispatch msg)
+  (cond ((eq? msg 'fuzz) (lambda () 'muzz))))
+
+
+(define sender/receiver-suite
+  (test-suite
+   "TCP sender en receiver testen"
+   (let ((receiver (maak-receiver 1010 dispatch))
+         (sender (maak-sender "localhost" 1010)))
+     (thread (lambda () (let loop () ((receiver 'check-inkomende-berichten!)) (loop))))
+     (test-case
+      "een bericht naar de receiver sturen"
+      (check-eq? ((sender 'send) '(fuzz)) 'muzz)))))
+
+(run-tests sender/receiver-suite)

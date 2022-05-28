@@ -1,0 +1,49 @@
+#lang racket
+
+(require "superspoormodel.rkt"
+         "../constanten.rkt"
+         (prefix-in algemeen: "../helpers/algemene-inleescode.rkt"))
+(provide maak-externspoormodel)
+
+
+(define (maak-externspoormodel definities
+                               ruwe-segmenten
+                               ruwe-connecties
+                               maak-object-args
+                               welk-soort)
+  
+  (let ((parent (maak-superspoormodel)))
+
+
+    (define (maak-object module poort extra id ignore defs)
+      ((algemeen:maak-object maak-object-args
+                             welk-soort
+                             (lambda (maak args . extra)
+                               (if (null? extra)
+                                   (maak args)
+                                   (apply maak args extra)))) module poort extra id ignore defs))
+
+    (define (voeg-toe! id module poort extra object)
+      
+      (cond ((algemeen:block? module definities)
+             ((parent 'voeg-detectieblok-toe!) id object))
+            ((algemeen:switch? module definities)
+             ((parent 'voeg-wissel-toe!) id object)))
+      
+      ((parent 'voeg-segment-toe!) id object))
+
+
+    (define (decodeer-tracks lst)
+      (algemeen:decodeer-tracks lst
+                                maak-object
+                                voeg-toe!
+                                definities))
+
+    (define (dispatch msg)
+      (cond ((eq? msg 'get-opstelling-informatie) (list definities ruwe-segmenten ruwe-connecties))
+            (else (parent 'msg))))
+
+    (if (and (decodeer-tracks ruwe-segmenten)
+             ((parent 'setup-segmenten) ruwe-connecties))
+        dispatch
+        failed)))
