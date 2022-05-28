@@ -1,0 +1,43 @@
+((t-1 150)
+	D-12
+	D-9
+	S-2-3
+	U-3
+	D-11
+	(set-speed 200)
+	reverse
+	U-3
+	S-2-3
+	D-4
+	(set-speed 250)
+	D-2
+	D-1
+	U-2
+	D-3
+	(set-speed 100)
+	D-5
+	(set-speed 250)
+	S-1
+	U-1
+	D-6
+	reverse
+	U-1
+	S-1
+	D-7
+	(stop))
+
+((t-2 100)
+	D-15
+	D-14
+	D-13
+	(wait t-1 D-11 passing)
+	D-8
+	S-2-3
+	U-3
+	D-11
+	reverse
+	U-3
+	S-2-3
+	D-9
+	D-12
+	(stop))
